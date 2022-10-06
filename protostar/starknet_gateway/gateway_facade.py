@@ -2,6 +2,7 @@ import dataclasses
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, NamedTuple, Optional, Union
+from weakref import proxy
 
 from starknet_py.contract import Contract, ContractFunction, InvokeResult
 from starknet_py.net import AccountClient
@@ -383,7 +384,9 @@ class GatewayFacade:
     ):
         try:
             contract = await Contract.from_address(
-                address=contract_address, client=client or self._gateway_client
+                address=contract_address,
+                client=client or self._gateway_client,
+                proxy_config=True,
             )
         except ContractNotFoundError as err:
             raise ContractNotFoundException(contract_address) from err
