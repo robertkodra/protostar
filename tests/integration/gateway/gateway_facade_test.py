@@ -8,7 +8,6 @@ from starknet_py.net.client_models import (
     TransactionStatus,
 )
 from starknet_py.net.gateway_client import GatewayClient, Network
-from starkware.starknet.services.api.gateway.transaction import Declare
 
 from protostar.compiler.compiled_contract_reader import CompiledContractReader
 from protostar.starknet_gateway.gateway_facade import (
@@ -20,7 +19,11 @@ from protostar.starknet_gateway.gateway_facade import (
 )
 from protostar.utils.data_transformer import CairoOrPythonData
 from tests.conftest import DevnetAccount
-from tests.data.contracts import CONTRACT_WITH_CONSTRUCTOR, IDENTITY_CONTRACT
+from tests.data.contracts import (
+    CONTRACT_WITH_CONSTRUCTOR,
+    IDENTITY_CONTRACT,
+    PROXY_CONTRACT,
+)
 from tests.integration.conftest import CreateProtostarProjectFixture
 from tests.integration.protostar_fixture import ProtostarFixture
 
@@ -246,5 +249,25 @@ async def test_max_fee_estimation(
     tx = cast(Declare, gateway_client.intercepted_txs[0])
     assert tx is not None
     assert tx.max_fee is not None
-    assert tx.max_fee is not "auto"
+    assert tx.max_fee != "auto"
     assert tx.max_fee > 0
+
+
+@pytest.fixture(name="proxy_contract_path", scope="module")
+def proxy_contract_path_fixture(protostar: ProtostarFixture) -> Path:
+    protostar.create_files({"./src/proxy.cairo": PROXY_CONTRACT})
+    protostar.append_contract_entry_in_config_file(
+        contract_name="proxy", path_strs=["./src/proxy.cairo"]
+    )
+    protostar.build_sync()
+    result = protostar.project_root_path / "build" / "proxy.json"
+    return result
+
+
+async def test_calling_through_proxy(
+    # gateway_facade: GatewayFacade,
+    # gateway_client: GatewayClientTxInterceptor,
+    # compiled_contract_path: Path,
+    proxy_contract_path: Path,
+):
+    assert proxy_contract_path.exists()

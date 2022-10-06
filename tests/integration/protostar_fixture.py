@@ -215,6 +215,17 @@ class ProtostarFixture:
         )
         return file_path
 
+    def append_contract_entry_in_config_file(
+        self, contract_name: str, path_strs: list[str]
+    ) -> None:
+        protostar_toml_path = self._project_root_path / "protostar.toml"
+        protostar_toml_path.write_text(
+            protostar_toml_path.read_text().replace(
+                '["protostar.contracts"]',
+                f'["protostar.contracts"]\n{contract_name} = {str(path_strs)}',
+            )
+        )
+
     @staticmethod
     def _save_file(path: Path, content: str) -> None:
         path.parent.mkdir(exist_ok=True, parents=True)
@@ -242,7 +253,9 @@ def build_protostar_fixture(
 
     protostar_toml_path = project_root_path / "protostar.toml"
     protostar_toml_writer = ProtostarTOMLWriter()
-    protostar_toml_reader = ProtostarTOMLReader(protostar_toml_path=protostar_toml_path)
+    protostar_toml_reader = ProtostarTOMLReader(
+        protostar_toml_path=protostar_toml_path, no_caching=True
+    )
 
     project_cairo_path_builder = ProjectCairoPathBuilder(
         project_root_path=project_root_path,

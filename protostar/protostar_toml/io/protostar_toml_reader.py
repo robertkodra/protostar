@@ -16,8 +16,10 @@ class ProtostarTOMLReader:
     def __init__(
         self,
         protostar_toml_path: Path,
+        no_caching=False,
     ):
         self.path = protostar_toml_path
+        self._no_caching = no_caching
         self._cache: Optional[Dict[ProtostarTOMLReader.FlattenSectionName, Any]] = None
 
     def get_section(
@@ -95,7 +97,8 @@ class ProtostarTOMLReader:
                 flatdict.FlatDict(protostar_toml_dict, delimiter="."),
             )
 
-            self._cache = protostar_toml_flat_dict
+            if not self._no_caching:
+                self._cache = protostar_toml_flat_dict
 
             return protostar_toml_flat_dict
 
