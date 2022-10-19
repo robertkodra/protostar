@@ -1,7 +1,13 @@
 from typing import Optional
 
+from protostar.testing.starkware.execution_resources_summary import (
+    ExecutionResourcesSummary,
+)
 
-def estimate_fee(execution_resources) -> Optional[float]:
+
+def estimate_fee(
+    execution_resources: Optional[ExecutionResourcesSummary],
+) -> Optional[float]:
     if not execution_resources:
         return None
     weights: dict[str, float] = {
