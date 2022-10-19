@@ -33,6 +33,7 @@ class TimedTestCaseResult(TestCaseResult, TimedTestResult):
 @dataclass(frozen=True)
 class PassedTestCaseResult(TimedTestCaseResult):
     execution_resources: Optional[ExecutionResourcesSummary]
+    estimated_fee: Optional[float] = None
 
 
 @dataclass(frozen=True)

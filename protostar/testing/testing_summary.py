@@ -71,6 +71,16 @@ class TestingSummary:
             log_color_provider.bold("Seed: ".ljust(header_width))
             + str(self.testing_seed)
         )
+        estimated_fees: dict[str, float] = {}
+        for result in self.test_results:
+            if isinstance(result, PassedTestCaseResult) and result.estimated_fee:
+                estimated_fees[result.test_case_name] = result.estimated_fee
+        if estimated_fees:
+            logger.info(log_color_provider.bold("Estimated fees:".ljust(header_width)))
+            for test_name, estimated_fee in estimated_fees.items():
+                logger.info(
+                    f"    - for test {test_name}: {estimated_fee} gas ({estimated_fee * 1_000_000_000} WEI)"
+                )
 
     def log_slowest_test_cases(
         self,
