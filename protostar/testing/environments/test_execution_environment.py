@@ -6,6 +6,7 @@ from starkware.starknet.business_logic.execution.objects import CallInfo
 from protostar.starknet.cheatcode import Cheatcode
 from protostar.testing.cheatcodes import (
     ExpectEventsCheatcode,
+    ExpectCallCheatcode,
     ExpectRevertCheatcode,
 )
 from protostar.testing.cheatcodes.expect_revert_cheatcode import ExpectRevertContext
@@ -98,5 +99,11 @@ class TestCaseCheatcodeFactory(CommonTestCheatcodeFactory):
                 syscall_dependencies,
                 self._state.starknet,
                 self._finish_hook,
+            ),
+            ExpectCallCheatcode(
+                syscall_dependencies,
+                self._state.starknet,
+                self._finish_hook,
+                self._state.contract.contract_address,
             ),
         ]
