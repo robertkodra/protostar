@@ -16,6 +16,7 @@ from protostar.commands import (
     InstallCommand,
     InvokeCommand,
     MigrateCommand,
+    MigrateConfigurationFileCommand,
     RemoveCommand,
     TestCommand,
     UpdateCommand,
@@ -32,6 +33,7 @@ from protostar.configuration_file import (
     ConfigurationFileFactory,
     ConfigurationFileV1,
     ConfigurationFileV2ContentFactory,
+    ConfigurationFileV2Migrator,
     ConfigurationTOMLContentBuilder,
 )
 from protostar.io import InputRequester, log_color_provider
@@ -122,6 +124,17 @@ def build_di_container(
         protostar_version=protostar_version,
     )
 
+    migrate_configuration_file_command = MigrateConfigurationFileCommand(
+        logger=logger,
+        configuration_file_migrator=ConfigurationFileV2Migrator(
+            protostar_version=protostar_version,
+            current_configuration_file=configuration_file,
+            content_factory=ConfigurationFileV2ContentFactory(
+                content_builder=ConfigurationTOMLContentBuilder()
+            ),
+        ),
+    )
+
     commands: list[ProtostarCommand] = [
         InitCommand(
             requester=input_requester,
@@ -184,6 +197,7 @@ def build_di_container(
         CairoMigrateCommand(script_root, logger),
         InvokeCommand(gateway_facade_factory=gateway_facade_factory, logger=logger),
         CallCommand(gateway_facade_factory=gateway_facade_factory, logger=logger),
+        migrate_configuration_file_command,
     ]
 
     protostar_cli = ProtostarCLI(
