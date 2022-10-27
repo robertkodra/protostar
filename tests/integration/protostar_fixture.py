@@ -1,5 +1,4 @@
 import asyncio
-import os
 from argparse import Namespace
 from logging import Logger, getLogger
 from pathlib import Path
@@ -7,24 +6,21 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, c
 
 from pytest_mock import MockerFixture
 from starknet_py.net import KeyPair
-from starknet_py.net.client_models import (
-    DeployAccountTransaction,
-    InvokeFunction,
-    StarknetTransaction,
-)
+from starknet_py.net.client_models import InvokeFunction, StarknetTransaction
 from starknet_py.net.gateway_client import GatewayClient, Network
 from starknet_py.net.models import StarknetChainId
+from starknet_py.net.models.transaction import DeployAccount
 from starknet_py.net.signer.stark_curve_signer import StarkCurveSigner
 
 from protostar.cli.map_targets_to_file_paths import map_targets_to_file_paths
 from protostar.commands import (
     BuildCommand,
+    CallCommand,
     DeclareCommand,
     FormatCommand,
     InitCommand,
     InvokeCommand,
     MigrateCommand,
-    CallCommand,
 )
 from protostar.commands.deploy_command import DeployCommand
 from protostar.commands.init.project_creator.new_project_creator import (
@@ -340,12 +336,12 @@ class TransactionRegistry:
             False
         ), f"Couldn't find transaction (index={index}, expected_tx_type={expected_tx_type})"
 
-    def get_intercepted_account_transaction(
-        self, index: int
-    ) -> DeployAccountTransaction:
-        tx = self._intercepted_txs[index]
-        assert isinstance(tx, DeployAccountTransaction)
-        return tx
+    def get_intercepted_account_transaction(self, index: int) -> DeployAccount:
+        intercepted_deploy_account_txs: list[DeployAccount] = []
+        for tx in self._intercepted_txs:
+            if isinstance(tx, DeployAccount):
+                intercepted_deploy_account_txs.append(tx)
+        return intercepted_deploy_account_txs[index]
 
 
 class GatewayClientTxInterceptor(GatewayClient):
