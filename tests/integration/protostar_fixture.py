@@ -1,9 +1,9 @@
 import asyncio
 from argparse import Namespace
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 from pytest_mock import MockerFixture
 from starknet_py.net import KeyPair
@@ -23,6 +23,7 @@ from protostar.commands import (
     InvokeCommand,
     MigrateCommand,
 )
+from protostar.commands.deploy_account_command import DeployAccountCommand
 from protostar.commands.deploy_command import DeployCommand
 from protostar.commands.init.project_creator.new_project_creator import (
     NewProjectCreator,
@@ -43,6 +44,7 @@ from protostar.migrator import Migrator, MigratorExecutionEnvironment
 from protostar.protostar_toml import ProtostarTOMLWriter
 from protostar.self.protostar_directory import ProtostarDirectory
 from protostar.starknet_gateway import Fee, GatewayFacade, GatewayFacadeFactory
+from protostar.starknet_gateway.gateway_facade import Wei
 from protostar.testing import TestingSummary
 
 
@@ -60,6 +62,7 @@ class ProtostarFixture:
         test_command: TestCommand,
         invoke_command: InvokeCommand,
         call_command: CallCommand,
+        deploy_account_command: DeployAccountCommand,
         transaction_registry: "TransactionRegistry",
     ) -> None:
         self._project_root_path = project_root_path
@@ -73,6 +76,7 @@ class ProtostarFixture:
         self._invoke_command = invoke_command
         self._transaction_registry = transaction_registry
         self._call_command = call_command
+        self._deploy_account_command = deploy_account_command
 
     @property
     def project_root_path(self) -> Path:
@@ -123,6 +127,31 @@ class ProtostarFixture:
         args.wait_for_acceptance = False
         args.chain_id = StarknetChainId.TESTNET
         return await self._deploy_command.run(args)
+
+    async def deploy_account(
+        self,
+        account_address: str,
+        account_address_salt: int,
+        account_class_hash: int,
+        max_fee: Wei,
+        nonce: int,
+        gateway_url: Optional[str],
+        account_constructor_input: Optional[list[int]],
+    ):
+        args = Namespace()
+        args.account_address = account_address
+        args.salt = account_address_salt
+        args.account_class_hash = account_class_hash
+        args.account_constructor_input = account_constructor_input
+        args.max_fee = max_fee
+        args.nonce = nonce
+        args.network = None
+        args.signer_class = None
+        args.gateway_url = gateway_url
+        args.private_key_path = None
+        args.chain_id = StarknetChainId.TESTNET
+
+        return await self._deploy_account_command.run(args)
 
     async def test(
         self, targets: List[str], last_failed: bool = False
@@ -316,8 +345,8 @@ class ProtostarFixture:
 
 @dataclass
 class TransactionRegistry:
-    invoke_txs: list[InvokeFunction] = []
-    deploy_account_txs: list[DeployAccount] = []
+    invoke_txs: list[InvokeFunction] = field(default_factory=list)
+    deploy_account_txs: list[DeployAccount] = field(default_factory=list)
 
     def register(self, tx: StarknetTransaction):
         if isinstance(tx, InvokeFunction):
@@ -451,6 +480,10 @@ def build_protostar_fixture(
         transaction_registry=transaction_registry,
     )
 
+    deploy_account_command = DeployAccountCommand(
+        gateway_facade_factory=gateway_facade_factory, logger=logger
+    )
+
     migrate_command = MigrateCommand(
         migrator_builder=migrator_builder,
         log_color_provider=log_color_provider,
@@ -502,6 +535,7 @@ def build_protostar_fixture(
         deploy_command=deploy_command,
         test_command=test_command,
         invoke_command=invoke_command,
+        deploy_account_command=deploy_account_command,
         transaction_registry=transaction_registry,
     )
 
