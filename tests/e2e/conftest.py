@@ -2,17 +2,17 @@
 import json
 import shlex
 import shutil
-from os import chdir, mkdir, path, getcwd
+from os import chdir, getcwd, mkdir, path
 from pathlib import Path
 from subprocess import PIPE, STDOUT, run
-from typing import Callable, List, Optional, Union, Tuple, Generator
+from typing import Callable, Generator, List, Optional, Tuple, Union
 
 import pexpect
 import pytest
 import tomli
 import tomli_w
-from typing_extensions import Protocol
 from py._path.local import LocalPath
+from typing_extensions import Protocol
 
 from protostar.self.protostar_directory import ProtostarDirectory
 from tests.conftest import run_devnet
