@@ -79,7 +79,8 @@ class TestingSummary:
             logger.info(log_color_provider.bold("Estimated fees:".ljust(header_width)))
             for test_name, estimated_fee in estimated_fees.items():
                 logger.info(
-                    f"    - for test {test_name}: {estimated_fee} gas ({estimated_fee * 1_000_000_000} WEI)"
+                    f'    - for a single run of the test "{test_name}": '
+                    f"{estimated_fee} gas ({estimated_fee * 1_000_000_000} WEI)"
                 )
 
     def log_slowest_test_cases(

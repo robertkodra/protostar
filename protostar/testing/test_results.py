@@ -69,6 +69,7 @@ class PassedFuzzTestCaseResult(PassedTestCaseResult, FuzzResult):
             execution_resources=passed_test_case_result.execution_resources,
             execution_time=passed_test_case_result.execution_time,
             fuzz_runs_count=fuzz_result.fuzz_runs_count,
+            estimated_fee=passed_test_case_result.estimated_fee,
         )
 
 
