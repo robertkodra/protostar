@@ -55,14 +55,18 @@ class TestExecutionState(ExecutionState):
         )
 
     def fork(self) -> Self:
-        return dataclasses.replace(
+        result = dataclasses.replace(
             super().fork(),
             config=deepcopy(self.config),
             context=deepcopy(self.context),
-            contract=self.contract,
             output_recorder=self.output_recorder.fork(),
             stopwatch=self.stopwatch.fork(),
         )
+        if result.contract:
+            result.contract.actual_resources = self.contract.actual_resources
+        else:
+            result.contract = self.contract
+        return result
 
     def determine_test_mode(self, test_case: TestCase):
         self.config.determine_mode(test_case=test_case, contract=self.contract)

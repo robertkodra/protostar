@@ -70,7 +70,7 @@ class TestExecutionEnvironment(ExecutionEnvironment[TestExecutionResult]):
                     )
                 )
 
-        if execution_resources:
+        if execution_resources and hasattr(self.state.contract, "actual_resources"):
             execution_resources.estimated_fee = calculate_tx_fee(
                 resources=self.state.contract.actual_resources,
                 gas_price=self.state.starknet.cheatable_state.general_config.min_gas_price,
