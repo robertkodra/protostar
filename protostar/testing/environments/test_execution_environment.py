@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Any
 
 from starkware.starknet.business_logic.execution.objects import CallInfo
+from starkware.starknet.business_logic.transaction.fee import calculate_tx_fee
 
 from protostar.starknet.cheatcode import Cheatcode
 from protostar.testing.cheatcodes import (
@@ -68,6 +69,12 @@ class TestExecutionEnvironment(ExecutionEnvironment[TestExecutionResult]):
                         call_info.call_info.execution_resources
                     )
                 )
+
+        execution_resources.estimated_fee = calculate_tx_fee(
+            resources=self.state.contract.actual_resources,
+            gas_price=self.state.starknet.cheatable_state.general_config.min_gas_price,
+            general_config=self.state.starknet.cheatable_state.general_config,
+        )
 
         return execution_resources
 

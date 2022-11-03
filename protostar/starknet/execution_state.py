@@ -1,16 +1,17 @@
 import dataclasses
 from dataclasses import dataclass
 
-from starkware.starknet.testing.contract import StarknetContract
 from typing_extensions import Self
 
 from protostar.starknet.forkable_starknet import ForkableStarknet
+
+from .wrapped_starknet_contract import WrappedStarknetContract
 
 
 @dataclass
 class ExecutionState:
     starknet: ForkableStarknet
-    contract: StarknetContract
+    contract: WrappedStarknetContract
 
     def fork(self) -> Self:
         starknet_fork = self.starknet.fork()

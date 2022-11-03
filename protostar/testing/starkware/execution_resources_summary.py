@@ -74,6 +74,7 @@ class ExecutionResourcesSummary:
     n_steps: Statistic = field(default_factory=CountStatistic)
     n_memory_holes: Statistic = field(default_factory=CountStatistic)
     builtin_name_to_count_map: Dict[str, Statistic] = field(default_factory=dict)
+    estimated_fee: float = field(default_factory=float)
 
     @classmethod
     def from_execution_resources(cls, execution_resources: ExecutionResources):

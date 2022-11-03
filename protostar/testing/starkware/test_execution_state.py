@@ -59,6 +59,7 @@ class TestExecutionState(ExecutionState):
             super().fork(),
             config=deepcopy(self.config),
             context=deepcopy(self.context),
+            contract=self.contract,
             output_recorder=self.output_recorder.fork(),
             stopwatch=self.stopwatch.fork(),
         )
