@@ -70,11 +70,12 @@ class TestExecutionEnvironment(ExecutionEnvironment[TestExecutionResult]):
                     )
                 )
 
-        execution_resources.estimated_fee = calculate_tx_fee(
-            resources=self.state.contract.actual_resources,
-            gas_price=self.state.starknet.cheatable_state.general_config.min_gas_price,
-            general_config=self.state.starknet.cheatable_state.general_config,
-        )
+        if execution_resources:
+            execution_resources.estimated_fee = calculate_tx_fee(
+                resources=self.state.contract.actual_resources,
+                gas_price=self.state.starknet.cheatable_state.general_config.min_gas_price,
+                general_config=self.state.starknet.cheatable_state.general_config,
+            )
 
         return execution_resources
 
