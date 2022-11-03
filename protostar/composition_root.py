@@ -19,6 +19,7 @@ from protostar.commands import (
     UpdateCommand,
     UpgradeCommand,
     CallCommand,
+    DeployAccountCommand
 )
 from protostar.commands.cairo_migrate_command import CairoMigrateCommand
 from protostar.commands.init.project_creator import (
@@ -183,6 +184,7 @@ def build_di_container(
         CairoMigrateCommand(script_root, logger),
         InvokeCommand(gateway_facade_factory=gateway_facade_factory, logger=logger),
         CallCommand(gateway_facade_factory=gateway_facade_factory, logger=logger),
+        DeployAccountCommand(gateway_facade_factory=gateway_facade_factory, logger=logger)
     ]
 
     protostar_cli = ProtostarCLI(

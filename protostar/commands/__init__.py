@@ -11,3 +11,4 @@ from .test import TestCommand
 from .update import UpdateCommand
 from .upgrade_command import UpgradeCommand
 from .call_command import CallCommand
+from .deploy_account_command import DeployAccountCommand
